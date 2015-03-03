@@ -3,7 +3,7 @@ package <%=packageName%>.web.rest.dto;
 import <%=packageName%>.domain.ExternalAccount;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Collections;
 <% } %>
 import org.hibernate.validator.constraints.Email;
 
@@ -19,8 +19,10 @@ public class UserDTO {
     @Size(min = 1, max = 50)
     private String login;
 
+    <% if (openidconnectAuth != 'yes') { %> 
     @NotNull
-    @Size(min = 5, max = 100)
+    @Size(min = 5, max = 100) <% } %><% if (openidconnectAuth == 'yes') { %>
+    @Size(min = 0, max = 100) <% } %>
     private String password;
 
     @Size(max = 50)
