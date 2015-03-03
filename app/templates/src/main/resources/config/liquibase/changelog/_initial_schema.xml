@@ -54,7 +54,7 @@
             tableName="T_USER"
             unique="true">
             <column name="email" type="varchar(100)"/>
-        </createIndex><% if ((socialAuth == 'yes')||(openidconnectAuth == 'yes')) { %>
+        </createIndex><% if (openidconnectAuth == 'yes') { %>
 
         <createTable tableName="T_EXTERNAL_ACCOUNT">
             <column name="external_account_id" type="bigint" autoIncrement="true">
