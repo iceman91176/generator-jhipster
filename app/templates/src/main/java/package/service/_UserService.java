@@ -13,6 +13,7 @@ import <%=packageName%>.security.SecurityUtils;
 import <%=packageName%>.service.util.RandomUtil;
 import org.joda.time.DateTime;<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
 import org.joda.time.LocalDate;<% } %>
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -75,13 +76,13 @@ public class UserService {
     }<% } %>
 
     public User createUserInformation(String login, String password, String firstName, String lastName, String email,
-                                      String langKey<% if (openidconnectAuth == 'yes')  { %>.ExternalAccount externalAccount<% } %>) {
+                                      String langKey<% if (openidconnectAuth == 'yes')  { %>,ExternalAccount externalAccount<% } %>) {
         User newUser = new User();<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
         Authority authority = authorityRepository.findOne("ROLE_USER");
         Set<Authority> authorities = new HashSet<>();<% } %><% if (databaseType == 'cassandra') { %>
         newUser.setId(UUID.randomUUID().toString());
         Set<String> authorities = new HashSet<>();<% } %>
-        String encryptedPassword = passwordEncoder.encode(password);
+        //String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(login);
         // new user gets initially a generated password
         
