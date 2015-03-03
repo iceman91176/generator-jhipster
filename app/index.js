@@ -466,8 +466,6 @@ JhipsterGenerator.prototype.app = function app() {
     var webappDir = 'src/main/webapp/';
     
     this.externalauthProviders = new Array();
-    this.externalauthProviders.concat(this.socialAuthProviders);
-    console.log("Auth Provider " + this.openidconnectAuthProvider);
     if (this.openidconnectAuthProvider != null)
     	this.externalauthProviders.push(this.openidconnectAuthProvider);
 
