@@ -1,6 +1,9 @@
 package <%=packageName%>.web.rest.dto;
 <% if (openidconnectAuth == 'yes') { %>
 import <%=packageName%>.domain.ExternalAccount;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
 <% } %>
 import org.hibernate.validator.constraints.Email;
 
