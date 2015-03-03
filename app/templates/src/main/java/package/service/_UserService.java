@@ -2,7 +2,9 @@ package <%=packageName%>.service;
 <% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
 import <%=packageName%>.domain.Authority;<% if (authenticationType == 'session') { %>
 import <%=packageName%>.domain.PersistentToken;<% } %><% } %>
-import <%=packageName%>.domain.User;<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
+import <%=packageName%>.domain.User;<% if (openidconnectAuth=='yes') { %>
+import <%=packageName%>.domain.ExternalAccount;<% } %>
+<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
 import <%=packageName%>.repository.AuthorityRepository;<% } %><% if (authenticationType == 'session') { %>
 import <%=packageName%>.repository.PersistentTokenRepository;<% } %>
 import <%=packageName%>.repository.UserRepository;<% if (databaseType == 'cassandra') { %>
@@ -73,7 +75,7 @@ public class UserService {
     }<% } %>
 
     public User createUserInformation(String login, String password, String firstName, String lastName, String email,
-                                      String langKey) {
+                                      String langKey<% if (openidconnectAuth == 'yes')  { %>.ExternalAccount externalAccount<% } %>) {
         User newUser = new User();<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
         Authority authority = authorityRepository.findOne("ROLE_USER");
         Set<Authority> authorities = new HashSet<>();<% } %><% if (databaseType == 'cassandra') { %>
@@ -82,15 +84,33 @@ public class UserService {
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(login);
         // new user gets initially a generated password
-        newUser.setPassword(encryptedPassword);
+        
+        if (StringUtils.isNotBlank(password)) {
+            String encryptedPassword = passwordEncoder.encode(password);
+            newUser.setPassword(encryptedPassword);
+        }<% if (openidconnectAuth == 'yes')  { %>
+        else {
+            newUser.getExternalAccounts().add(externalAccount);
+            externalAccount.setUser(newUser);
+        }<% } %>
+        
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setEmail(email);
         newUser.setLangKey(langKey);
-        // new user is not active
-        newUser.setActivated(false);
-        // new user gets registration key
-        newUser.setActivationKey(RandomUtil.generateActivationKey());<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
+
+        if (StringUtils.isNotBlank(password)) {
+	        // new user is not active
+	        newUser.setActivated(false);
+	        // new user gets registration key
+	        newUser.setActivationKey(RandomUtil.generateActivationKey());
+        }<% if (openidconnectAuth == 'yes')  { %>
+        else {
+        	newUser.setActivated(true);
+        	
+        }<% } %>
+        
+        <% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
         authorities.add(authority);<% } %><% if (databaseType == 'cassandra') { %>
         authorities.add(AuthoritiesConstants.USER);<% } %>
         newUser.setAuthorities(authorities);
@@ -98,6 +118,16 @@ public class UserService {
         log.debug("Created Information for User: {}", newUser);
         return newUser;
     }
+    
+    public User createUserInformation(String login, String password, String firstName, String lastName, String email,
+            String langKey) {
+    	return createUserInformation(login, password, firstName, lastName, email, langKey, null);
+	}<% if (openidconnectAuth == 'yes')  { %>
+	public User createUserInformation(String login, String firstName, String lastName, String email,
+	            String langKey, ExternalAccount externalAccount) {
+		return createUserInformation(login, null, firstName, lastName, email, langKey, externalAccount);
+	}
+	<% } %>
 
     public void updateUserInformation(String firstName, String lastName, String email) {<% if (javaVersion == '8') { %>
         userRepository.findOneByLogin(SecurityUtils.getCurrentLogin()).ifPresent(u -> {
@@ -124,6 +154,12 @@ public class UserService {
             log.debug("Changed password for User: {}", u);
         });<%} else {%>
         User currentUser = userRepository.findOneByLogin(SecurityUtils.getCurrentLogin());
+        <% if (openidconnectAuth == 'yes')  { %>
+        if (currentUser.getExternalAccounts().size()>0){
+        	log.warn("Password cannot be changed for external user");
+        	return;
+        }
+        <% } %>
         String encryptedPassword = passwordEncoder.encode(password);
         currentUser.setPassword(encryptedPassword);
         userRepository.save(currentUser);

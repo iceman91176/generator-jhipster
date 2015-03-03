@@ -91,6 +91,12 @@ public class User<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")<% if (hibernateCache != 'no') { %>
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)<% } %>
     private Set<PersistentToken> persistentTokens = new HashSet<>();<% } %>
+    
+    <% if (openidconnectAuth == 'yes') { if (databaseType == 'sql') { %>
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")<% if (hibernateCache != 'no') { %>
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)<% }} %>
+    private Set<ExternalAccount> externalAccounts = new HashSet<>();
+    <% } %>
 
     public <% if (databaseType == 'sql') { %>Long<% } else if (databaseType == 'mongodb' || databaseType == 'cassandra') { %>String<% } %> getId() {
         return id;
@@ -179,6 +185,15 @@ public class User<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
     public void setPersistentTokens(Set<PersistentToken> persistentTokens) {
         this.persistentTokens = persistentTokens;
     }<% } %>
+    
+    <% if (openidconnectAuth == 'yes') { %>
+    public Set<ExternalAccount> getExternalAccounts() {
+        return externalAccounts;
+    }
+
+    public void setExternalAccounts(Set<ExternalAccount> externalAccountIds) {
+        this.externalAccounts = externalAccountIds;
+    }<% } %>
 
     @Override
     public boolean equals(Object o) {
@@ -213,7 +228,8 @@ public class User<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
                 ", email='" + email + '\'' +
                 ", activated='" + activated + '\'' +
                 ", langKey='" + langKey + '\'' +
-                ", activationKey='" + activationKey + '\'' +
+                ", activationKey='" + activationKey + '\'' +<% if(openidconnectAuth == 'yes') { %>
+                ", externalAccounts=" + externalAccounts +<% } %>
                 "}";
     }
 }

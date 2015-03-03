@@ -3,6 +3,9 @@ package <%=packageName%>.config;
 import <%=packageName%>.security.*;<% } %><% if (authenticationType == 'session') { %>
 import <%=packageName%>.web.filter.CsrfCookieGeneratorFilter;<% } %><% if (authenticationType == 'xauth') { %>
 import <%=packageName%>.security.xauth.*;<% } %>
+<% if ((openidconnectAuth == 'yes')) { %>
+import <%=packageName%>.config.OpendIDConnectConfiguration;
+<% } %>
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;<% if (authenticationType == 'session') { %>
 import org.springframework.core.env.Environment;<% } %><% if (authenticationType == 'oauth2') { %>
@@ -56,8 +59,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {<% if (
     private RememberMeServices rememberMeServices;<% } %><% if (authenticationType == 'xauth') { %>
 
     @Inject
-    private TokenProvider tokenProvider;<% } %>
-
+    private TokenProvider tokenProvider;<% } %><% if (openidconnectAuth == 'yes') { %>
+    @Inject
+    private OpendIDConnectConfiguration oidConfig;
+    <% } %>
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -107,7 +113,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {<% if (
             .logoutUrl("/api/logout")
             .logoutSuccessHandler(ajaxLogoutSuccessHandler)
             .deleteCookies("JSESSIONID"<% if (clusteredHttpSession == 'hazelcast') { %>, "hazelcast.sessionId"<% } %>)
-            .permitAll()<% } %>
+            .permitAll()<% } %><% if (openidconnectAuth == 'yes') { %>
+        .and()
+        	.apply(oidConfig.oidConfigurer())<% } %>
         .and()<% if (authenticationType == 'xauth') { %>
             .csrf()
             .disable()<% } %>

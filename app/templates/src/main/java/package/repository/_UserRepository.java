@@ -2,7 +2,8 @@ package <%=packageName%>.repository;
 <% if (databaseType == 'cassandra') { %>
 import com.datastax.driver.core.*;
 import com.datastax.driver.mapping.Mapper;
-import com.datastax.driver.mapping.MappingManager;<% } %>
+import com.datastax.driver.mapping.MappingManager;<% } %><% if (openidconnectAuth=='yes') { %>
+import <%=packageName%>.domain.ExternalAccountProvider; <% } %>
 import <%=packageName%>.domain.User;
 
 import org.joda.time.DateTime;<% if (databaseType == 'sql') { %>
@@ -40,6 +41,11 @@ public interface UserRepository extends <% if (databaseType == 'sql') { %>JpaRep
     Optional<User> findOneByLogin(String login);
 
     void delete(User t);
+    
+    <% if (openidconnectAuth == 'yes') { if (databaseType == 'sql') { %>
+    @Query("select u from User u inner join u.externalAccounts ea where ea.externalProvider = ?1 and ea.externalId = ?2")<% } else if (databaseType == 'nosql') { %>
+    @Query("{externalAccounts: { $in: [ {externalProvider: ?0, externalId: ?1} ]}}")<% } %>
+    Optional<User> getUserByExternalAccount(ExternalAccountProvider provider, String externalAccountId);<% } %>
 
 }<% } else if ((databaseType == 'sql' || databaseType == 'mongodb') && javaVersion == '7') { %>
 public interface UserRepository extends <% if (databaseType == 'sql') { %>JpaRepository<User, Long><% } %><% if (databaseType == 'mongodb') { %>MongoRepository<User, String><% } %> {
@@ -51,6 +57,12 @@ public interface UserRepository extends <% if (databaseType == 'sql') { %>JpaRep
     User findOneByLogin(String login);
 
     User findOneByEmail(String email);
+    
+    <% if (openidconnectAuth=='yes') { if (databaseType == 'sql') { %>
+    @Query("select u from User u inner join u.externalAccounts ea where ea.externalProvider = ?1 and ea.externalId = ?2")<% } else if (databaseType == 'nosql') { %>
+    @Query("{externalAccounts: { $in: [ {externalProvider: ?0, externalId: ?1} ]}}")<% } %>
+    User getUserByExternalAccount(ExternalAccountProvider provider, String externalAccountId);<% } %>
+    
 
 }<% } else if (databaseType == 'cassandra') { %>
 @Repository

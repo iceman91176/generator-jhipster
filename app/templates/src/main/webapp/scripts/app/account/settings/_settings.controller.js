@@ -6,6 +6,13 @@ angular.module('<%=angularAppName%>')
         $scope.error = null;
         Principal.identity().then(function(account) {
             $scope.settingsAccount = account;
+            <% if ((socialAuth == 'yes')||(openidconnectAuth == 'yes')) { %>
+            if(angular.isArray(account.externalAccounts)) {
+            	if (account.externalAccounts.length > 0){
+            		$scope.disableSettings=true;
+            	}
+            }
+            <% } %>
         });
 
         $scope.save = function () {

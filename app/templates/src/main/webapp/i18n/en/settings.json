@@ -13,6 +13,9 @@
                 "fail": "<strong>An error has occurred!</strong> Settings could not be saved.",
                 "emailexists": "<strong>E-mail is already in use!</strong> Please choose another one."
             },
+            "warn":{
+            	"external": "<strong>Warning!</strong> Settings of external accounts can't be changed."
+            },
             "success": "<strong>Settings saved!</strong>",
             "validate": {
                 "firstname": {

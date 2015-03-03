@@ -1,5 +1,7 @@
 package <%=packageName%>.web.rest.dto;
-
+<% if (openidconnectAuth == 'yes') { %>
+import <%=packageName%>.domain.ExternalAccount;
+<% } %>
 import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.NotNull;
@@ -31,7 +33,10 @@ public class UserDTO {
     @Size(min = 2, max = 5)
     private String langKey;
 
-    private List<String> roles;
+    private List<String> roles;<% if (openidconnectAuth == 'yes') { %>
+
+    private Set<ExternalAccount> externalAccounts = new HashSet<>();
+<% } %>
 
     public UserDTO() {
     }
@@ -46,6 +51,28 @@ public class UserDTO {
         this.langKey = langKey;
         this.roles = roles;
     }
+    
+    <% if (openidconnectAuth == 'yes') { %>
+
+    public UserDTO(String login, String password, String firstName, String lastName, String email, String langKey,
+                   List<String> roles, Set<ExternalAccount> externalAccounts) {
+        this.login = login;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.langKey = langKey;
+        this.roles = roles;
+        this.externalAccounts = externalAccounts;
+    }
+
+    public UserDTO(String firstName, String lastName, String email, ExternalAccount externalAccount) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.externalAccounts.add(externalAccount);
+    }
+    <% } %>
 
     public String getPassword() {
         return password;
@@ -73,8 +100,12 @@ public class UserDTO {
 
     public List<String> getRoles() {
         return roles;
-    }
+    }<% if (openidconnectAuth == 'yes') { %>
 
+    public Set<ExternalAccount> getExternalAccounts() {
+        return Collections.unmodifiableSet(externalAccounts);
+    }
+    <% } %>
     @Override
     public String toString() {
         return "UserDTO{" +
@@ -84,7 +115,8 @@ public class UserDTO {
         ", lastName='" + lastName + '\'' +
         ", email='" + email + '\'' +
         ", langKey='" + langKey + '\'' +
-        ", roles=" + roles +
+        ", roles=" + roles +<% if (openidconnectAuth == 'yes') { %>
+        ", externalAccounts=" + externalAccounts + <% } %>
         '}';
     }
 }

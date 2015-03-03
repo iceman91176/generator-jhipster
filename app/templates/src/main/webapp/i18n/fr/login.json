@@ -11,6 +11,10 @@
             "error": {
                 "authentication": "<strong>Erreur d'authentification!</strong> Veuillez vérifier vos identifiants de connexion."
             }
+        },
+        "external": {
+            "or": "ou"
         }
+        
     }
 }

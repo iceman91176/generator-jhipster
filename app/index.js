@@ -60,7 +60,7 @@ JhipsterGenerator.prototype.askFor = function askFor() {
                 if (/^([a-zA-Z0-9_]*)$/.test(input)) return true;
                 return 'Your application name cannot contain special characters or a blank space, using the default name instead';
             },
-            message: '(1/13) What is the base name of your application?',
+            message: '(1/14) What is the base name of your application?',
             default: 'jhipster'
         },
         {
@@ -70,13 +70,13 @@ JhipsterGenerator.prototype.askFor = function askFor() {
                 if (/^([a-z_]{1}[a-z0-9_]*(\.[a-z_]{1}[a-z0-9_]*)*)$/.test(input)) return true;
                 return 'The package name you have provided is not a valid Java package name.';
             },
-            message: '(2/13) What is your default Java package name?',
+            message: '(2/14) What is your default Java package name?',
             default: 'com.mycompany.myapp'
         },
         {
             type: 'list',
             name: 'javaVersion',
-            message: '(3/13) Do you want to use Java 8?',
+            message: '(3/14) Do you want to use Java 8?',
             choices: [
                 {
                     value: '8',
@@ -92,7 +92,7 @@ JhipsterGenerator.prototype.askFor = function askFor() {
         {
             type: 'list',
             name: 'authenticationType',
-            message: '(4/13) Which *type* of authentication would you like to use?',
+            message: '(4/14) Which *type* of authentication would you like to use?',
             choices: [
                 {
                     value: 'session',
@@ -109,13 +109,64 @@ JhipsterGenerator.prototype.askFor = function askFor() {
             ],
             default: 0
         },
+        
+        {
+            type: 'list',
+            name: 'openidconnectAuth',
+            message: '(5/14) Enable openidconnect authentication?',
+            choices: [
+                {
+                    value: 'no',
+                    name: 'No',
+                    checked: true
+                },
+                {
+                    value: 'yes',
+                    name: 'Yes'
+                }
+            ],
+        	default: 1,
+            when: function(answers) {
+                return answers.authenticationType == 'cookie';
+            }
+        },
+        {
+            type: 'list',
+            name: 'openidconnectAuth',
+            message: '(5/14) Enable openidconnect authentication?',
+            choices: [
+                {
+                    value: 'no',
+                    name: 'No (this option is only compatible with cookie based authentication)',
+                    checked: true
+                }
+            ],
+            when: function(answers) {
+                return answers.authenticationType != 'cookie';
+            }
+        },
+        {
+            type: 'input',
+            name: 'openidconnectAuthProvider',
+            message: '(5/14) Name of first OpenId connect Provider (without space?',
+            when : function(answers) {
+                return answers.openidconnectAuth == 'yes'
+            },
+            validate: function (input) {
+                if (/^([a-zA-Z0-9_]*)$/.test(input)) return true;
+                return 'Your application name cannot contain special characters or a blank space, using the default name instead';
+            },
+        	default: 'myopenidprovider'
+        },
+        
+        
         {
             when: function (response) {
                 return (!(response.authenticationType == 'oauth2' || response.javaVersion == '7'));
             },
             type: 'list',
             name: 'databaseType',
-            message: '(5/13) Which *type* of database would you like to use?',
+            message: '(6/14) Which *type* of database would you like to use?',
             choices: [
                 {
                     value: 'sql',
@@ -134,11 +185,11 @@ JhipsterGenerator.prototype.askFor = function askFor() {
         },
         {
             when: function (response) {
-                return (response.authenticationType == 'oauth2' || response.javaVersion == '7');
+                return (response.authenticationType == 'oauth2' || response.openidconnectAuth == true || response.javaVersion == '7');
             },
             type: 'list',
             name: 'databaseType',
-            message: '(5/13) Which *type* of database would you like to use? (Note that you cannot choose Cassandra as you selected either OAuth2 authentication or Java 7, which are not supported)',
+            message: '(6/14) Which *type* of database would you like to use? (Note that you cannot choose Cassandra as you selected either OAuth2 authentication,OpenID Connect Auth or Java 7, which are not supported)',
             choices: [
                 {
                     value: 'sql',
@@ -157,7 +208,7 @@ JhipsterGenerator.prototype.askFor = function askFor() {
             },
             type: 'list',
             name: 'prodDatabaseType',
-            message: '(6/13) Which *production* database would you like to use?',
+            message: '(7/14) Which *production* database would you like to use?',
             choices: [
                 {
                     value: 'mysql',
@@ -176,7 +227,7 @@ JhipsterGenerator.prototype.askFor = function askFor() {
             },
             type: 'list',
             name: 'devDatabaseType',
-            message: '(7/13) Which *development* database would you like to use?',
+            message: '(8/14) Which *development* database would you like to use?',
             choices: [
                 {
                     value: 'h2Memory',
@@ -195,7 +246,7 @@ JhipsterGenerator.prototype.askFor = function askFor() {
             },
             type: 'list',
             name: 'devDatabaseType',
-            message: '(7/13) Which *development* database would you like to use?',
+            message: '(8/14) Which *development* database would you like to use?',
             choices: [
                 {
                     value: 'h2Memory',
@@ -214,7 +265,7 @@ JhipsterGenerator.prototype.askFor = function askFor() {
             },
             type: 'list',
             name: 'hibernateCache',
-            message: '(8/13) Do you want to use Hibernate 2nd level cache?',
+            message: '(9/14) Do you want to use Hibernate 2nd level cache?',
             choices: [
                 {
                     value: 'no',
@@ -234,7 +285,7 @@ JhipsterGenerator.prototype.askFor = function askFor() {
         {
             type: 'list',
             name: 'clusteredHttpSession',
-            message: '(9/13) Do you want to use clustered HTTP sessions?',
+            message: '(10/14) Do you want to use clustered HTTP sessions?',
             choices: [
                 {
                     value: 'no',
@@ -250,7 +301,7 @@ JhipsterGenerator.prototype.askFor = function askFor() {
         {
             type: 'list',
             name: 'websocket',
-            message: '(10/13) Do you want to use WebSockets?',
+            message: '(11/14) Do you want to use WebSockets?',
             choices: [
                 {
                     value: 'no',
@@ -266,7 +317,7 @@ JhipsterGenerator.prototype.askFor = function askFor() {
         {
             type: 'list',
             name: 'buildTool',
-            message: '(11/13) Would you like to use Maven or Gradle for building the backend?',
+            message: '(12/14) Would you like to use Maven or Gradle for building the backend?',
             choices: [
                 {
                     value: 'maven',
@@ -292,13 +343,13 @@ JhipsterGenerator.prototype.askFor = function askFor() {
                     name: 'Gulp.js'
                 }
             ],
-            message: '(12/13) Would you like to use Grunt or Gulp.js for building the frontend?',
+            message: '(13/14) Would you like to use Grunt or Gulp.js for building the frontend?',
             default: 'grunt'
         },
         {
             type: 'confirm',
             name: 'useCompass',
-            message: '(13/13) Would you like to use the Compass CSS Authoring Framework?',
+            message: '(14/14) Would you like to use the Compass CSS Authoring Framework?',
             default: false
         }
     ];
@@ -306,6 +357,11 @@ JhipsterGenerator.prototype.askFor = function askFor() {
     this.baseName = this.config.get('baseName');
     this.packageName = this.config.get('packageName');
     this.authenticationType = this.config.get('authenticationType');
+    
+    this.openidconnectAuth = this.config.get('openidconnectAuth');
+    this.openidconnectAuthProvider = this.config.get('openidconnectAuthProvider');
+    
+    
     this.clusteredHttpSession = this.config.get('clusteredHttpSession');
     this.websocket = this.config.get('websocket');
     this.databaseType = this.config.get('databaseType');
@@ -360,6 +416,8 @@ JhipsterGenerator.prototype.askFor = function askFor() {
             this.baseName = props.baseName;
             this.packageName = props.packageName;
             this.authenticationType = props.authenticationType;
+            this.openidconnectAuth = props.openidconnectAuth;
+            this.openidconnectAuthProvider = props.openidconnectAuthProvider;
             this.hibernateCache = props.hibernateCache;
             this.clusteredHttpSession = props.clusteredHttpSession;
             this.websocket = props.websocket;
@@ -406,6 +464,12 @@ JhipsterGenerator.prototype.app = function app() {
     var javaDir = 'src/main/java/' + packageFolder + '/';
     var resourceDir = 'src/main/resources/';
     var webappDir = 'src/main/webapp/';
+    
+    this.externalauthProviders = new Array();
+    this.externalauthProviders.concat(this.socialAuthProviders);
+    console.log("Auth Provider " + this.openidconnectAuthProvider);
+    if (this.openidconnectAuthProvider != null)
+    	this.externalauthProviders.push(this.openidconnectAuthProvider);
 
     // Remove old files
 
@@ -543,6 +607,18 @@ JhipsterGenerator.prototype.app = function app() {
         this.template('src/main/java/package/repository/_OAuth2AccessTokenRepository.java', javaDir + 'repository/OAuth2AccessTokenRepository.java', this, {});
         this.template('src/main/java/package/repository/_OAuth2RefreshTokenRepository.java', javaDir + 'repository/OAuth2RefreshTokenRepository.java', this, {});
     }
+    
+    if (this.openidconnectAuth == 'yes') {
+        this.template('src/main/java/package/config/_OpendIDConnectConfiguration.java', javaDir + 'config/OpendIDConnectConfiguration.java');
+        this.template('src/main/java/package/security/oidc/_OIDCAuthenticationSuccessHandler.java', javaDir + 'security/oidc/OIDCAuthenticationSuccessHandler.java');
+        this.template('src/main/java/package/security/oidc/_OIDCAuthFilter.java', javaDir + 'security/oidc/OIDCAuthFilter.java');
+        this.template('src/main/java/package/security/oidc/_OIDCAuthProvider.java', javaDir + 'security/oidc/OIDCAuthProvider.java');
+        this.template('src/main/java/package/security/oidc/_OIDCAuthToken.java', javaDir + 'security/oidc/OIDCAuthToken.java');
+        this.template('src/main/java/package/security/oidc/_OIDCConfigurer.java', javaDir + 'security/oidc/OIDCConfigurer.java');
+        this.template('src/main/java/package/security/oidc/_OIDCUserInfoFetcher.java', javaDir + 'security/oidc/OIDCUserInfoFetcher.java');
+        this.template('src/main/java/package/domain/_ExternalAccount.java', javaDir + 'domain/ExternalAccount.java');
+        this.template('src/main/java/package/domain/_ExternalAccountProvider.java', javaDir + 'domain/ExternalAccountProvider.java');
+    }    
 
     this.template('src/main/java/package/config/_SecurityConfiguration.java', javaDir + 'config/SecurityConfiguration.java', this, {});
     this.template('src/main/java/package/config/_ThymeleafConfiguration.java', javaDir + 'config/ThymeleafConfiguration.java', this, {});

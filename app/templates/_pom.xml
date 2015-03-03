@@ -52,7 +52,8 @@
         <spring-cloud.version>1.1.0.RELEASE</spring-cloud.version><% if (authenticationType == 'oauth2') { %>
         <spring-security-oauth2.version>2.0.1.RELEASE</spring-security-oauth2.version><% } %>
         <swagger-springmvc.version>0.9.5</swagger-springmvc.version>
-        <usertype-core.version>3.2.0.GA</usertype-core.version>
+        <usertype-core.version>3.2.0.GA</usertype-core.version><% if (openidconnectAuth == 'yes') { %>
+        <mitreid-connect-version>1.1.12</mitreid-connect-version><% } %>
     </properties>
 
     <dependencies>
@@ -247,7 +248,12 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>${javax.inject.version}</version>
-        </dependency>
+        </dependency><% if (openidconnectAuth == 'yes') { %>        
+        <dependency>
+            <groupId>org.mitre</groupId>
+            <artifactId>openid-connect-client</artifactId>
+            <version>${mitreid-connect-version}</version>
+        </dependency><% } %>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>

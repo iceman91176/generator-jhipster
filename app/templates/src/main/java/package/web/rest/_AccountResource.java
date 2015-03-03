@@ -3,7 +3,9 @@ package <%=packageName%>.web.rest;
 import com.codahale.metrics.annotation.Timed;<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
 import <%=packageName%>.domain.Authority;<% } %><% if (authenticationType == 'session') { %>
 import <%=packageName%>.domain.PersistentToken;<% } %>
-import <%=packageName%>.domain.User;<% if (authenticationType == 'session') { %>
+import <%=packageName%>.domain.User;<% if (openidconnectAuth == 'yes')  { %>
+import <%=packageName%>.domain.ExternalAccount;
+import <%=packageName%>.domain.ExternalAccountProvider;<% } if (authenticationType == 'session') { %>
 import <%=packageName%>.repository.PersistentTokenRepository;<% } %>
 import <%=packageName%>.repository.UserRepository;
 import <%=packageName%>.security.SecurityUtils;
@@ -33,7 +35,8 @@ import java.util.stream.Collectors;<% } %>
 @RequestMapping("/api")
 public class AccountResource {
 
-    private final Logger log = LoggerFactory.getLogger(AccountResource.class);
+    private final Logger log = LoggerFactory.getLogger(AccountResource.class);<% if (openidconnectAuth == 'yes')  { %>
+    private final static String EXTERNAL_AUTH_AS_USERDTO_KEY = "AccountResource.signInAsUserDTO";<% } %>
 
     @Inject
     private UserRepository userRepository;
@@ -153,6 +156,14 @@ public class AccountResource {
         for (Authority authority : user.getAuthorities()) {
             roles.add(authority.getName());
         }
+        
+        <% if (openidconnectAuth=='yes'){ %>
+        Set<ExternalAccount> externalAccounts = new HashSet<>();
+        
+        for (ExternalAccount eAccount : user.getExternalAccounts()) {
+        	externalAccounts.add(eAccount);
+        }<%}%>
+        
         return new ResponseEntity<>(
             new UserDTO(
                 user.getLogin(),
@@ -161,7 +172,7 @@ public class AccountResource {
                 user.getLastName(),
                 user.getEmail(),
                 user.getLangKey(),
-                roles),
+                roles<% if (openidconnectAuth=='yes'){ %>,externalAccounts)<% } %>,),
             HttpStatus.OK);<% } %>
     }
 
@@ -185,6 +196,10 @@ public class AccountResource {
         if (userHavingThisLogin != null && !userHavingThisLogin.getLogin().equals(SecurityUtils.getCurrentLogin())) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        <% if (openidconnectAuth=='yes'){ %>//Do not update Information of external accounts, because that information is stored there
+        if(userHavingThisLogin.getExternalAccounts().size()>0){
+        	return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }<% } %>
         userService.updateUserInformation(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);<% } %>
     }

@@ -5,7 +5,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetails;<% if (openidconnectAuth == 'yes') { %>
+import com.google.common.collect.ImmutableMap;<% } %>
 
 import java.util.Collection;
 
@@ -31,7 +32,10 @@ public final class SecurityUtils {
                 userName = springSecurityUser.getUsername();
             } else if (authentication.getPrincipal() instanceof String) {
                 userName = (String) authentication.getPrincipal();
-            }
+            } <% if (openidconnectAuth == 'yes') { %>else if (authentication.getPrincipal() instanceof ImmutableMap){
+            	ImmutableMap<String, String> principal = (ImmutableMap<String, String>) authentication.getPrincipal();
+            	userName=principal.get("preferredUsername");
+            }<% } %>
         }
         return userName;
     }

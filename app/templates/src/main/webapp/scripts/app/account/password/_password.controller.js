@@ -4,6 +4,12 @@ angular.module('<%=angularAppName%>')
     .controller('PasswordController', function ($scope, Auth, Principal) {
         Principal.identity().then(function(account) {
             $scope.account = account;
+            $scope.disablePassword=false;
+            if(angular.isArray($scope.account.externalAccounts)) {
+            	if ($scope.account.externalAccounts.length > 0){
+            		$scope.disablePassword=true;
+            	}
+            }
         });
 
         $scope.success = null;
