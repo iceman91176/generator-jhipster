@@ -54,7 +54,44 @@
             tableName="T_USER"
             unique="true">
             <column name="email" type="varchar(100)"/>
+        </createIndex><% if ((socialAuth == 'yes')||(openidconnectAuth == 'yes')) { %>
+
+        <createTable tableName="T_EXTERNAL_ACCOUNT">
+            <column name="external_account_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="external_provider" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="T_EXTERNAL_ACCOUNT"
+                                 constraintName="fk_user_external_account"
+                                 referencedColumnNames="id"
+                                 referencedTableName="T_USER"/>
+
+        <!-- an account from an external provider can only exist in the database a single time -->
+        <createIndex indexName="idx_external_account_external_id"
+                     tableName="T_EXTERNAL_ACCOUNT"
+                     unique="true">
+            <column name="external_id" type="varchar(50)"/>
+            <column name="external_provider" type="varchar(20)"/>
         </createIndex>
+
+        <!-- additionally, a T_USER cannot have multiple accounts with the same external provider -->
+        <createIndex indexName="idx_external_account_user"
+                     tableName="T_EXTERNAL_ACCOUNT"
+                     unique="true">
+            <column name="user_id" type="bigint"/>
+            <column name="external_provider" type="varchar(20)"/>
+        </createIndex><% } %>
 
         <createTable tableName="T_AUTHORITY">
             <column name="name" type="varchar(50)">
