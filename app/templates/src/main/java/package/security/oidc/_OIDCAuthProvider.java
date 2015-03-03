@@ -22,10 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;<% if (socialAuth == 'yes') { %>
-import org.springframework.social.ApiException;
-import org.springframework.social.connect.UserProfile;
-import org.springframework.social.connect.web.ProviderSignInAttempt;<% } %>
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;

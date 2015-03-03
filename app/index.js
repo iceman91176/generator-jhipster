@@ -127,7 +127,7 @@ JhipsterGenerator.prototype.askFor = function askFor() {
             ],
         	default: 1,
             when: function(answers) {
-                return answers.authenticationType == 'cookie';
+                return answers.authenticationType == 'session';
             }
         },
         {
@@ -137,12 +137,12 @@ JhipsterGenerator.prototype.askFor = function askFor() {
             choices: [
                 {
                     value: 'no',
-                    name: 'No (this option is only compatible with cookie based authentication)',
+                    name: 'No (this option is only compatible with session based authentication)',
                     checked: true
                 }
             ],
             when: function(answers) {
-                return answers.authenticationType != 'cookie';
+                return answers.authenticationType != 'session';
             }
         },
         {
