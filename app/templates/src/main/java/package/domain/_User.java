@@ -44,7 +44,7 @@ public class User<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
     @JsonIgnore<% if (openidconnectAuth != 'yes') { %> 
     @NotNull
     @Size(min = 5, max = 100) <% } %><% if (openidconnectAuth == 'yes') { %>
-    @Size(min = 0, max = 100) } %><% if (databaseType == 'sql') { %>
+    @Size(min = 0, max = 100) <% } %><% if (databaseType == 'sql') { %>
     @Column(length = 100)<% } %>
     private String password;
 
