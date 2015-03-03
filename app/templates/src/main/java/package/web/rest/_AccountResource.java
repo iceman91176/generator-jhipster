@@ -172,7 +172,7 @@ public class AccountResource {
                 user.getLastName(),
                 user.getEmail(),
                 user.getLangKey(),
-                roles<% if (openidconnectAuth=='yes'){ %>,externalAccounts)<% } %>,),
+                roles<% if (openidconnectAuth=='yes'){ %>,externalAccounts)<% } %>,
             HttpStatus.OK);<% } %>
     }
 
